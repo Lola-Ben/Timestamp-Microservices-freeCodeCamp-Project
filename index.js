@@ -27,22 +27,37 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+
+
+// get current date
+app.get("/api/", (req, res) => { 
+  const date = new Date();
+
+  res.send({"unix": date.getTime(), "utc": date.toUTCString() })
+});
+
+
 // general api for all dates
 app.get("/api/:date?", (req, res) => {
 
   // getting the date from req params
   let unix = req.params.date;
+  
    // validating unix if it has date format
   if (unix.match(/-/g)) {
-    // splitting the user date to get [yy,mm,dd]
-    const userDate = unix.split('-');
-    
     // creating a new Date() class to get unix time by passing userDate as arguments
-    unix = new Date(userDate[0], userDate[1], userDate[2]).getTime();
+    const date = new Date(unix);
+
+    return res.json({ "unix": date.getTime(), "utc": date.toUTCString() })
+
+  } else if (Number(unix)) {
+      const date = new Date(unix * 1000);
+      return res.json({"unix": unix, "utc": date.toUTCString()})
+    
   }
+    res.json({ error: "Invalid Date" });
   
-  const date = new Date( unix * 1000);
-  res.json({"unix": unix, "utc": date.toUTCString()})
+
 }); 
 
 
